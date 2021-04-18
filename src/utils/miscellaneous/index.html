@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" >
+    <head>
+        <title>HQtim</title>
+        <link rel="icon" href="favicon.ico" />
+    </head>
+    <body style="background-color: dar; color: white;" >
+        <p>Date/Time: <span id="datetime"></span></p>
+        <script>
+            var dt = new Date();
+            document.getElementById("datetime").innerHTML = dt.toLocaleString();
+        </script>
+    </body>
+</html>
