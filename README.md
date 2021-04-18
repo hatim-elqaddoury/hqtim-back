@@ -1,2 +1,1 @@
-# hqtim-back
-node js
+# HQTIM REST API
