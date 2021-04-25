@@ -7,7 +7,6 @@
 /log
 /logs
 *.log
-package-lock.json
 
 # dependencies
 /node_modules
