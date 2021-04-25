@@ -1,6 +1,6 @@
 require("dotenv").config({ path: '.env' });
 
-const appRouter = require("./src/app.router");
+const appRouter = require("./router/app.router");
 
 const express = require("express");
 const helmet = require("helmet");

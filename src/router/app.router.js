@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { checkToken } = require("./utils/auth/token_validation");
+const { checkToken } = require("../utils/auth/token_validation");
 const {
   createUser,
   login,
@@ -7,25 +7,25 @@ const {
   getUsers,
   updateUser,
   deleteUser
-} = require("./controller/user.controller");
+} = require("../controller/user.controller");
 const {
   createProduct,
   getProductById,
   getProducts,
   updateProduct,
   deleteProduct
-} = require("./controller/product.controller");
+} = require("../controller/product.controller");
 
 const {
   uploadFile,
   uploadFiles,
   getFile,
   sendFile
-} = require("./controller/file.controller");
+} = require("../controller/file.controller");
 
 const {
   sendEmailTo, sendEmailFrom
-} = require("./controller/mailer.controller");
+} = require("../controller/mailer.controller");
 
 /**
  * Base URL PATH
