@@ -59,7 +59,6 @@ router.get(basePath+"/file/:filename", sendFile); // from ulpoads
 router.post(basePath+"/uploadFile", uploadFile); //fieldname : file
 
 
-
 /**
  * EMAIL TEST
  */
@@ -79,7 +78,6 @@ router.all("/index", function(req, res) {
  * IF NOTHING FROM ABOVE, REFIRECT TO HOME
  */
 router.all("**", function(req, res) {
-
   res.redirect("/index");
   // if(!process.env.APP_REDIRECT) res.redirect("/index");
   // res.redirect(process.env.APP_REDIRECT);
