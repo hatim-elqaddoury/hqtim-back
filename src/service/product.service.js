@@ -1,14 +1,14 @@
 const pool = require("../utils/config/database");
 
-module.exports = {
+module.exports = class ProductService {
 
-  _createProduct: (data, callBack) => {
+  async createProduct(data, callBack) {
     pool.query(
       'insert into product(name, imgUrl, price) values(?,?,?)',
       [
         data.name,
         data.imgUrl,
-        data.price||0
+        data.price || 0
       ],
       (error, results, fields) => {
         if (error) {
@@ -18,8 +18,9 @@ module.exports = {
         return callBack(null, results);
       }
     );
-  },
-  _getProductById: (id, callBack) => {
+  }
+
+  async getProductById(id, callBack) {
     pool.query(
       'select name, imgUrl, price from product where id = ?',
       [id],
@@ -31,8 +32,9 @@ module.exports = {
         return callBack(null, results[0]);
       }
     );
-  },
-  _getProducts: callBack => {
+  }
+
+  async getProducts(callBack) {
     pool.query(
       'select name, imgUrl, price from product',
       [],
@@ -44,21 +46,23 @@ module.exports = {
         return callBack(null, results);
       }
     );
-  },
-  /**
-   * 
-   * @param {*} data - to fill
-   * @param {*} callBack - to fill
-   */
-  _getProductByCategory: (data, callBack) =>{
+  }
 
-  },
   /**
    * 
    * @param {*} data - to fill
    * @param {*} callBack - to fill
    */
-  _updateProduct: (data, callBack) => {
+  async getProductByCategory(data, callBack) {
+
+  }
+
+  /**
+   * 
+   * @param {*} data - to fill
+   * @param {*} callBack - to fill
+   */
+  async updateProduct(data, callBack) {
     pool.query(
       'update product set name=?, imgUrl=?, price=? where id = ?',
       [
@@ -74,13 +78,14 @@ module.exports = {
         return callBack(null, results[0]);
       }
     );
-  },
-/**
- * 
- * @param {data} data 
- * @param {callBack} callBack 
- */
-  _deleteProduct: (data, callBack) => {
+  }
+
+  /**
+   * 
+   * @param {data} data 
+   * @param {callBack} callBack 
+   */
+  async deleteProduct(data, callBack) {
     pool.query(
       'delete from product where id = ?',
       [data.id],
@@ -90,9 +95,10 @@ module.exports = {
           callBack(error);
         }
 
-        var isDeleted = results.affectedRows>0;
+        var isDeleted = results.affectedRows > 0;
         return callBack(null, isDeleted);
       }
     );
   }
+
 };

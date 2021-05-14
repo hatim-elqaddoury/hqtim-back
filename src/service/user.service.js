@@ -1,12 +1,15 @@
 const pool = require("../utils/config/database");
 
-module.exports = {
-  _createUser: (data, callBack) => {
+module.exports = class UserService {
+
+  constructor() {}
+
+  async createUser(data, callBack) {
     pool.query(
       'insert into user(firstName, lastName, gender, email, password, number) values(?,?,?,?,?,?)',
       [
-        data.first_name,
-        data.last_name,
+        data.firstname,
+        data.lastname,
         data.gender,
         data.email,
         data.password,
@@ -20,8 +23,9 @@ module.exports = {
         return callBack(null, results);
       }
     );
-  },
-  _getUserByUserEmail: (email, callBack) => {
+  }
+
+  async getUserByUserEmail(email, callBack) {
     pool.query(
       'select * from user where email = ?',
       [email],
@@ -32,20 +36,23 @@ module.exports = {
         return callBack(null, results[0]);
       }
     );
-  },
-  _getUserByUserId: (id, callBack) => {
+  }
+
+  async getUserByUserId(id, callBack) {
     pool.query(
-      'select id,firstName,lastName,gender,email,number from user where id = ?',
+      'select id,firstName,lastName,gender,email,number from user where id = 9LLLL',
       [id],
       (error, results, fields) => {
         if (error) {
-          callBack(error);
+          return callBack(error);
         }
+
         return callBack(null, results[0]);
       }
     );
-  },
-  _getUsers: callBack => {
+  }
+
+  async getUsers(callBack) {
     pool.query(
       'select id,firstName,lastName,gender,email,number from user',
       [],
@@ -56,13 +63,14 @@ module.exports = {
         return callBack(null, results);
       }
     );
-  },
-  _updateUser: (data, callBack) => {
+  }
+
+  async updateUser(data, callBack) {
     pool.query(
       'update user set firstName=?, lastName=?, gender=?, email=?, password=?, number=? where id = ?',
       [
-        data.first_name,
-        data.last_name,
+        data.firstname,
+        data.lastname,
         data.gender,
         data.email,
         data.password,
@@ -76,8 +84,9 @@ module.exports = {
         return callBack(null, results[0]);
       }
     );
-  },
-  _deleteUser: (data, callBack) => {
+  }
+
+  async deleteUser(data, callBack) {
     pool.query(
       'delete from user where id = ?',
       [data.id],
@@ -89,4 +98,5 @@ module.exports = {
       }
     );
   }
+
 };

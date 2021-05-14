@@ -1,134 +1,120 @@
-const multer = require("multer");
-const path = require("path");
+const FileService = require("../service/file.service");
+
 
 /**
- * Variables
+ * Middleware class (remember)
  */
-const uploadsFolder = "./uploads/"
-const internalFolder = "./src/assets/images/"
 
-/**
- * Storage engine
- */
-const storage = multer.diskStorage({
-    destination: uploadsFolder,
-    filename: (req, file, cb) => {
-        return cb(null, Date.now()+path.extname(file.originalname))
-    }
-});
+let fileS;
 
-/**
- * Filter
- */
-const filter = function (req, file, callback) {
-        var ext = path.extname(file.originalname);
-        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg' && ext !== '.mp4') {
-            return callback(new Error('Only images are allowed'))
-        }
-        callback(null, true)
+module.exports = class FileController {
+
+  constructor() {
+    fileS = new FileService();
+  }
+
+  /**
+   * upload a single file
+   */
+  uploadFile(req, res, next) {
+    fileS.uploadFile(req, res, (err) => {
+      if (err) {
+        // An unknown error occurred when uploading.
+        console.log("uploadFile : ", err);
+        res.status(415)
+        next(null, err.message);
+      } else if (!req.file) {
+        // fieldname is missing.
+        console.log("uploadFile : ", "filed name is missing");
+        res.status(415)
+        next(null, "filed name is missing");
+      } else {
+        // Everything went fine.
+        let msg = req.file.length + " file loaded";
+        console.log("uploadFile : ", msg);
+        next(null, msg);
+      }
+    });
+  }
+
+  /**
+   * upload multiple files
+   */
+  uploadFiles(req, res, next) {
+
+    fileS.uploadFiles(req, res, (err) => {
+      if (err) {
+        // An unknown error occurred when uploading.
+        console.log("uploadFiles : ", err);
+        res.status(415)
+        next(null, err.message);
+      } else if (!req.files) {
+        // fieldname is missing.
+        console.log("uploadFiles : ", "filedname is missing");
+        res.status(415)
+        next(null, "filed name is missing");
+      } else {
+        // Everything went fine.
+        let msg = req.files.length + " file(s) loaded";
+        console.log("uploadFiles : ", msg);
+        next(null, msg);
+      }
+    });
+  }
+
+  /**
+   * Send Internal file
+   * @param {*} req 
+   * @param {*} res 
+   */
+  sendInternalFile(req, res) {
+    var filename = req.params.filename;
+    res.status(200).sendFile(filename, {
+      root: fileS.getInternalFolder()
+    }, function (err) {
+      if (err) {
+        console.log("getFile : ", err.path + " not found");
+        res.sendStatus(err.status);
+      } else {
+        console.log('Sent:', filename);
+      }
+    })
+  }
+
+  /**
+   * Send Uploaded  file
+   * @param {*} req 
+   * @param {*} res 
+   */
+  sendUploadedFile(req, res) {
+    const filename = req.params.filename;
+
+    res.status(200).sendFile(filename, {
+      root: fileS.getUploadsFolder()
+    }, function (err) {
+      if (err) {
+        console.log("sendFile : ", err.path + " not found");
+        res.sendStatus(err.status);
+      } else {
+        console.log('Sent:', filename);
+      }
+    })
+  }
+
+  /**
+   * Download a file from url
+   * @param {*} req 
+   * @param {*} res 
+   */
+  saveFile(req, res) {
+    fileS.downloadFile(req, res, async (err) => {
+      if (err) {
+        return res.status(415).send(err);
+      } else {
+        // console.log(req)
+        res.status(201).send('finished downloading!');
+      }
+    });
+  }
+
 };
-
-/**
- * uploadFile function
- */
-const upload = multer({
-    storage: storage,
-    // fileFilter: filter,
-    limits: {
-        fileSize: 1024 * 1024 * 100
-    },
-    errorHandling: 'manual'
-});
-
-
-/**
- * upload a single file
- */
-var uploadFile = function(req, res, next) {
-  upload.single('file')(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      // A Multer error occurred when uploading.
-      console.log("uploadFile : ", err.message);
-      return next(err.message);
-    } else if (err) {
-      // An unknown error occurred when uploading.
-      console.log("uploadFile : ", err.message);
-      return next(err.message);
-    }else if(!req.file){
-      // fieldname is missing.
-      console.log("uploadFile : ", "filed name is missing");
-      //console.log(req.body);
-      next();
-    }else{
-      // Everything went fine.
-      console.log("uploadFile : ", 1 +" file loaded");
-      next();
-    }
-  })
-};
-
-/**
- * upload multiple files
- */
-var uploadFiles = function(req, res, next) {
-  upload.array('files')(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      // A Multer error occurred when uploading.
-      console.log("uploadFiles : ", err.message);
-      return next(err.message);
-    } else if (err) {
-      // An unknown error occurred when uploading.
-      console.log("uploadFiles : ", err.message);
-      return next(err.message);
-    }else if(!req.files){
-      // fieldname is missing.
-      console.log("uploadFile : ", "filedname is missing");
-      next();
-    }else{
-      // Everything went fine.
-      console.log("uploadFile : ", req.files.length +" file(s) loaded");
-      next();
-    }
-  })
-};
-
-/**
- * Get a file
- * @param {*} req 
- * @param {*} res 
- */
-var getFile = function(req, res) {
-  var filename = req.params.filename;
-  res.status(200).sendFile(filename, { root : internalFolder}, function (err) {
-    if (err) {
-      console.log("getFile : ", err.path + " not found");
-    }
-    // else {
-    //   console.log('getFile  :', filename + " sent");
-    // }
-  })
-};
-
-/**
- * Send a file
- * @param {*} req 
- * @param {*} res 
- */
-var sendFile = function(req, res) {
-  var filename = req.params.filename;
-  res.status(200).sendFile(filename, { root : uploadsFolder}, function (err) {
-    if (err) {
-      console.log("sendFile : ", err.path + " not found");
-    }
-    // else {
-    //   console.log('sendFile  :', filename + " sent");
-    // }
-  })
-};
-
-
-
-module.exports = {
-  uploadFile, uploadFiles, getFile, sendFile
-};
-
