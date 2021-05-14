@@ -15,7 +15,6 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-
 var sendMailTo = (to, subject, content, username) => {
 
     var mailOptions = {
