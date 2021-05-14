@@ -1,31 +1,18 @@
-const {
-  _createProduct,
-  _getProductById,
-  _getProducts,
-  _getProductByCategory,
-  _updateProduct,
-  _deleteProduct
-} = require("../service/product.service");
-const {
-  hashSync,
-  genSaltSync,
-  compareSync
-} = require("bcrypt");
-const {
-  encrypt
-} = require("../utils/crypto/crypto.service");
+const ProductService = require("../service/product.service");
 
-module.exports = {
-  /**
-   * Create User
-   * @param {} req 
-   * @param {*} res 
-   */
-  createProduct: (req, res) => {
+let productS;
+
+module.exports = class ProductController {
+
+  constructor() {
+    productS = new ProductService();
+  }
+
+  createProduct(req, res) {
     const data = req.body;
     console.log(data);
     if (req.file) data.imgUrl = req.protocol + '://' + req.get('host') + process.env.BASE_PATH + "/file/" + req.file.filename;
-    _createProduct(data, (err, results) => {
+    productS.createProduct(data, (err, results) => {
       if (err) {
         return res.status(500).json({
           message: err.code
@@ -35,41 +22,28 @@ module.exports = {
         message: data.name + " created succussfully"
       });
     });
-  },
+  }
 
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  getProductById: (req, res) => {
+  getProductById(req, res) {
     const id = req.params.id;
-    _getProductById(id, (err, results) => {
+    productS.getProductById(id, (err, results) => {
       if (err) return res.status(500).json(err.code);
       else if (!results) return res.status(500).json(err);
       else return res.status(200).json(results);
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  getProducts: (req, res) => {
-    _getProducts((err, results) => {
+  }
+
+  getProducts(req, res) {
+    productS.getProducts((err, results) => {
       if (err) return res.status(500).json(err.code);
       else if (!results) return res.status(500).json(err);
       else return res.status(200).json(results);
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  updateProduct: (req, res) => {
+  }
+
+  updateProduct(req, res) {
     const body = req.body;
-    _updateProduct(body, (err, results) => {
+    productS.updateProduct(body, (err, results) => {
       if (err)
         return res.status(500).json({
           message: err.code
@@ -78,17 +52,12 @@ module.exports = {
         message: "updated successfully"
       });
     });
-  },
+  }
 
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  deleteProduct: (req, res) => {
+  deleteProduct(req, res) {
     const data = req.body;
     console.log(data);
-    _deleteProduct(data, (err, results) => {
+    productS.deleteProduct(data, (err, results) => {
 
       if (err) {
         console.log(err);
@@ -107,4 +76,5 @@ module.exports = {
 
     });
   }
+
 };

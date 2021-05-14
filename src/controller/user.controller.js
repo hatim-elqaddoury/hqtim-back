@@ -1,25 +1,28 @@
 const {
-  _createUser,
-  _getUserByUserEmail,
-  _getUserByUserId,
-  _getUsers,
-  _updateUser,
-  _deleteUser
-} = require("../service/user.service");
-const { hashSync, genSaltSync, compareSync } = require("bcrypt");
-const { sign } = require("jsonwebtoken");
+  hashSync,
+  genSaltSync,
+  compareSync
+} = require("bcrypt");
 
-module.exports = {
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  createUser: (req, res) => {
+const {
+  sign
+} = require("jsonwebtoken");
+
+const UserService = require("../service/user.service");
+
+let userS;
+
+module.exports = class UserController {
+
+  constructor() {
+    userS = new UserService();
+  }
+
+  createUser(req, res) {
     const body = req.body;
     const salt = genSaltSync(10);
     body.password = hashSync(body.password, salt);
-    _createUser(body, (err, results) => {
+    this.userS.createUser(body, (err, results) => {
       if (err) {
         return res.status(500).json({
           message: err.code
@@ -29,15 +32,11 @@ module.exports = {
         message: "User created succussfully"
       });
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  login: (req, res) => {
+  }
+
+  login(req, res) {
     const body = req.body;
-    _getUserByUserEmail(body.email, (err, results) => {
+    this.userS.getUserByUserEmail(body.email, (err, results) => {
       if (err) {
         console.log(err);
       }
@@ -49,7 +48,9 @@ module.exports = {
       const result = compareSync(body.password, results.password);
       if (result) {
         results.password = undefined;
-        const jsontoken = sign({ result: results }, process.env.JWT_KEY, {
+        const jsontoken = sign({
+          result: results
+        }, process.env.JWTthis.userS.KEY, {
           expiresIn: "1h"
         });
         return res.json({
@@ -61,52 +62,38 @@ module.exports = {
         });
       }
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  getUserByUserId: (req, res) => {
+  }
+
+  getUserByUserId(req, res) {
     const id = req.params.id;
-    _getUserByUserId(id, (err, results) => {
+    userS.getUserByUserId(id, (err, results) => {
       if (err) {
         console.log(err);
-        return;
+        return res.send(500, err.code);
       }
       if (!results) {
-        return res.json({
-          message: "Record not Found"
-        });
+        return res.sendStatus(404);
       }
       results.password = undefined;
-      return res.json(results);
+      res.json(results);
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  getUsers: (req, res) => {
-    _getUsers((err, results) => {
+  }
+
+  getUsers(req, res) {
+    this.userS.getUsers((err, results) => {
       if (err) {
         console.log(err);
         return;
       }
       return res.json(results);
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  updateUser: (req, res) => {
+  }
+
+  updateUser(req, res) {
     const body = req.body;
     const salt = genSaltSync(10);
     body.password = hashSync(body.password, salt);
-    _updateUser(body, (err, results) => {
+    this.userS.updateUser(body, (err, results) => {
       if (err) {
         console.log(err);
         return;
@@ -115,15 +102,11 @@ module.exports = {
         message: "updated successfully"
       });
     });
-  },
-  /**
-   * 
-   * @param {*} req 
-   * @param {*} res 
-   */
-  deleteUser: (req, res) => {
+  }
+
+  deleteUser(req, res) {
     const data = req.body;
-    _deleteUser(data, (err, results) => {
+    this.userS.deleteUser(data, (err, results) => {
       if (err) {
         console.log(err);
         return;
@@ -138,4 +121,5 @@ module.exports = {
       });
     });
   }
+
 };
