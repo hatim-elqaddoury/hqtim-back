@@ -1,6 +1,7 @@
 const pool = require("../utils/config/database");
 
 module.exports = {
+
   _createProduct: (data, callBack) => {
     pool.query(
       'insert into product(name, imgUrl, price) values(?,?,?)',
@@ -44,20 +45,26 @@ module.exports = {
       }
     );
   },
+  /**
+   * 
+   * @param {*} data - to fill
+   * @param {*} callBack - to fill
+   */
   _getProductByCategory: (data, callBack) =>{
 
   },
+  /**
+   * 
+   * @param {*} data - to fill
+   * @param {*} callBack - to fill
+   */
   _updateProduct: (data, callBack) => {
     pool.query(
       'update product set name=?, imgUrl=?, price=? where id = ?',
       [
-        data.first_name,
-        data.last_name,
-        data.gender,
-        data.email,
-        data.password,
-        data.number,
-        data.id
+        data.name,
+        data.imgUrl,
+        data.price,
       ],
       (error, results, fields) => {
         if (error) {
@@ -68,16 +75,23 @@ module.exports = {
       }
     );
   },
+/**
+ * 
+ * @param {data} data 
+ * @param {callBack} callBack 
+ */
   _deleteProduct: (data, callBack) => {
     pool.query(
       'delete from product where id = ?',
       [data.id],
-      (error, results, fields) => {
+      (error, results) => {
         if (error) {
           console.log(error.sqlMessage);
           callBack(error);
         }
-        return callBack(null, results[0]);
+
+        var isDeleted = results.affectedRows>0;
+        return callBack(null, isDeleted);
       }
     );
   }

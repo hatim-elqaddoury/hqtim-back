@@ -6,8 +6,14 @@ const {
   _updateProduct,
   _deleteProduct
 } = require("../service/product.service");
-const { hashSync, genSaltSync, compareSync } = require("bcrypt");
-const { encrypt } = require("../utils/crypto/crypto.service");
+const {
+  hashSync,
+  genSaltSync,
+  compareSync
+} = require("bcrypt");
+const {
+  encrypt
+} = require("../utils/crypto/crypto.service");
 
 module.exports = {
   /**
@@ -16,16 +22,17 @@ module.exports = {
    * @param {*} res 
    */
   createProduct: (req, res) => {
-    const body = req.body;
-    if(req.file) body.imgUrl =  req.protocol + '://' + req.get('host') + process.env.BASE_PATH+ "/file/" + req.file.filename;
-    _createProduct(body, (err, results) => {
+    const data = req.body;
+    console.log(data);
+    if (req.file) data.imgUrl = req.protocol + '://' + req.get('host') + process.env.BASE_PATH + "/file/" + req.file.filename;
+    _createProduct(data, (err, results) => {
       if (err) {
         return res.status(500).json({
           message: err.code
         });
       }
       return res.status(201).json({
-        message: body.name + " created succussfully"
+        message: data.name + " created succussfully"
       });
     });
   },
@@ -62,7 +69,6 @@ module.exports = {
    */
   updateProduct: (req, res) => {
     const body = req.body;
-    
     _updateProduct(body, (err, results) => {
       if (err)
         return res.status(500).json({
@@ -73,6 +79,7 @@ module.exports = {
       });
     });
   },
+
   /**
    * 
    * @param {*} req 
@@ -80,19 +87,24 @@ module.exports = {
    */
   deleteProduct: (req, res) => {
     const data = req.body;
+    console.log(data);
     _deleteProduct(data, (err, results) => {
+
       if (err) {
         console.log(err);
         return;
       }
+
       if (!results) {
         return res.json({
           message: "Record Not Found"
         });
       }
+
       return res.json({
         message: "Product deleted successfully"
       });
+
     });
   }
 };

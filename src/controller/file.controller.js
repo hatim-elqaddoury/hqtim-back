@@ -56,7 +56,8 @@ var uploadFile = function(req, res, next) {
       return next(err.message);
     }else if(!req.file){
       // fieldname is missing.
-      console.log("uploadFile : ", "filedname is missing");
+      console.log("uploadFile : ", "filed name is missing");
+      //console.log(req.body);
       next();
     }else{
       // Everything went fine.
